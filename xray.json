@@ -1,0 +1,33 @@
+
+	{
+		"log" : {
+			"loglevel": "none"
+		},
+		"inbounds": [{
+			"port": "52014",
+			"protocol": "vmess",
+			"settings": {
+				"udp": true,
+				"clients": [{
+					"id": "fd0304ec-94ab-4f92-a9a7-6def76798230",
+					"level": 0,
+					"alterId": 4
+				}]
+			},
+			"streamSettings": {
+				"sockopt": {
+					"tcpFastOpen": true
+				},
+				"network": "tcp",
+				"tcpSettings": {
+					"header": {
+						"type": "http"
+					}
+				}
+			}
+		}],
+		"outbounds": [{
+			"protocol": "freedom"
+		}]
+	}
+	
