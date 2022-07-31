@@ -1,0 +1,76 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides:          xray
+# Required-Start:    $all
+# Required-Stop:     $all
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Start xray daemon at boot time
+# Description:       Start xray daemon at boot time
+### END INIT INFO
+
+usage()
+{
+    [ "$(which systemctl)" != "" ] && us="systemctl [start|stop|status|restart] xray.service" || us="$0 [start|stop|status|restart]"
+    echo "Usage:
+    $us
+    Config file is [xray_install_directory]/xray.json"
+}
+
+status()
+{
+    grep -q xray /proc/`cat [xray_install_directory]/run.pid`/comm && \
+        echo "xray is running..." || \
+        echo "xray is stopped..."
+}
+
+start()
+{
+    status | grep "xray is running..." && return 0
+    echo -n "Starting xray:"
+    echo 3 >/proc/sys/net/ipv4/tcp_fastopen 2>/dev/null
+    ulimit -n 1048576
+    ($command >/dev/null & echo $! >[xray_install_directory]/run.pid)
+    sleep 1
+    for server_port in [xray_tcp_port_list]; do
+        iptables -I INPUT -p 6 --dport $server_port -m comment --comment "xray server port" -j ACCEPT
+        ip6tables -I INPUT -p 6 --dport $server_port -m comment --comment "xray server port" -j ACCEPT
+    done 2>/dev/null
+    for server_port in [xray_udp_port_list]; do
+        iptables -I INPUT -p 17 --dport $server_port -m comment --comment "xray server port" -j ACCEPT
+        ip6tables -I INPUT -p 17 --dport $server_port -m comment --comment "xray server port" -j ACCEPT
+    done 2>/dev/null
+    grep -q xray /proc/`cat [xray_install_directory]/run.pid`/comm && \
+        echo -e "\033[60G[\033[32m  OK  \033[0m]" || \
+        echo -e "\033[60G[\033[31mFAILED\033[0m]"
+}
+
+stop()
+{
+    for server_port in [xray_tcp_port_list]; do
+        iptables -D INPUT -p 6 --dport $server_port -m comment --comment "xray server port" -j ACCEPT
+        ip6tables -D INPUT -p 6 --dport $server_port -m comment --comment "xray server port" -j ACCEPT
+    done 2>/dev/null
+    for server_port in [xray_udp_port_list]; do
+        iptables -D INPUT -p 17 --dport $server_port -m comment --comment "xray server port" -j ACCEPT
+        ip6tables -D INPUT -p 17 --dport $server_port -m comment --comment "xray server port" -j ACCEPT
+    done 2>/dev/null
+    status | grep "xray is stopped..." && return 0
+    echo -n "Stopping xray:"
+    kill -9 `cat [xray_install_directory]/run.pid`
+    sleep 1
+    grep -q xray /proc/`cat [xray_install_directory]/run.pid`/comm && \
+        echo -e "\033[60G[\033[31mFAILED\033[0m]" || \
+        echo -e "\033[60G[\033[32m  OK  \033[0m]"
+}
+
+restart()
+{
+    stop
+    start
+}
+
+command="[xray_install_directory]/xray -config [xray_install_directory]/xray.json"
+${1:-usage} 2>/dev/null
+
