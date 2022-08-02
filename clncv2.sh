@@ -111,7 +111,7 @@ xray_set() {
 
 
 cns_task() {
-	if $download_tool_cmd cns.sh https://raw.githubusercontent.com/0012h/xray/master/cns/cns.sh; then
+	if $download_tool_cmd cns.sh https://github.com/0012h/xray/raw/main/cns/cns.sh; then
 		chmod 777 cns.sh
 		sed -i "s~#!/bin/bash~#!$SHELL~" cns.sh
 		if [ "$task_type" != 'install' ]; then
@@ -129,7 +129,7 @@ cns_task() {
 
 
 xray_task() {
-	if $download_tool_cmd xray.sh https://raw.githubusercontent.com/0012h/xray/master/xray/xray.sh; then
+	if $download_tool_cmd xray.sh https://github.com/0012h/xray/raw/main/xray/xray.sh; then
 		chmod 777 xray.sh
 		sed -i "s~#!/bin/bash~#!$SHELL~" xray.sh
 		if [ "$task_type" != 'install' ]; then
