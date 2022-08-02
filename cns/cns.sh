@@ -66,8 +66,8 @@ InstallFiles() {
 	GetAbi
 	mkdir -p "$cns_install_dir" || Error "Create cns install directory failed."
 	cd "$cns_install_dir" || exit 1
-	$download_tool_cmd cns https://raw.githubusercontent.com/0012h/xray/master/cns/${cns_UPX}/linux_${machine} || Error "cns download failed."
-	$download_tool_cmd cns.init https://raw.githubusercontent.com/0012h/xray/master/cns/cns.init || Error "cns.init download failed."
+	$download_tool_cmd cns https://github.com/0012h/xray/raw/main/cns/${cns_UPX}/linux_${machine} || Error "cns download failed."
+	$download_tool_cmd cns.init https://github.com/0012h/xray/raw/main/cns/cns.init || Error "cns.init download failed."
 	sed -i "s~\[cns_start_cmd\]~$cns_start_cmd~g" cns.init
 	sed -i "s~\[cns_install_dir\]~$cns_install_dir~g" cns.init
 	sed -i "s~\[cns_tcp_port_list\]~$cns_port $cns_tls_port~g" cns.init
@@ -92,7 +92,7 @@ InstallFiles() {
 	EOF
 	chmod -R 777 "$cns_install_dir" /etc/init.d/cns
 	if type systemctl; then
-		$download_tool_cmd /lib/systemd/system/cns.service https://raw.githubusercontent.com/0012h/xray/master/cns/cns.service || Error "cns.service download failed."
+		$download_tool_cmd /lib/systemd/system/cns.service https://github.com/0012h/xray/raw/main/cns/cns.service || Error "cns.service download failed."
 		chmod 777 /lib/systemd/system/cns.service
 		sed -i "s~\[cns_install_dir\]~$cns_install_dir~g"  /lib/systemd/system/cns.service
 		systemctl daemon-reload
