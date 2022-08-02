@@ -217,15 +217,15 @@ InstallFiles() {
 	mkdir -p "${xray_install_directory:=/usr/local/xray}" || Error "Create xray install directory failed."
 	cd "$xray_install_directory" || Error "Create cns install directory failed."
 	#install xray
-	$download_tool_cmd xray https://raw.githubusercontent.com/0012h/xray/master/xray/${xray_UPX}/linux_${machine} || Error "xray download failed."
-	$download_tool_cmd xray.init https://raw.githubusercontent.com/0012h/xray/master/xray/xray.init || Error "xray.init download failed."
+	$download_tool_cmd xray https://github.com/0012h/xray/raw/main/xray/${xray_UPX}/linux_${machine} || Error "xray download failed."
+	$download_tool_cmd xray.init https://github.com/0012h/xray/raw/main/xray/xray.init || Error "xray.init download failed."
 	sed -i "s~\[xray_install_directory\]~$xray_install_directory~g" xray.init
 	sed -i "s~\[xray_tcp_port_list\]~$xray_http_port $xray_http_tls_port $xray_ws_port $xray_ws_tls_port~g" xray.init
 	sed -i "s~\[xray_udp_port_list\]~$xray_mkcp_port $xray_mkcp_xtls_port~g" xray.init
 	ln -s "$xray_install_directory/xray.init" /etc/init.d/xray
 	chmod -R 777 "$xray_install_directory" /etc/init.d/xray
 	if type systemctl; then
-		$download_tool_cmd /lib/systemd/system/xray.service https://raw.githubusercontent.com/0012h/xray/master/xray/xray.service || Error "xray.service download failed."
+		$download_tool_cmd /lib/systemd/system/xray.service https://github.com/0012h/xray/raw/main/xray/xray.service || Error "xray.service download failed."
 		chmod 777 /lib/systemd/system/xray.service
 		sed -i "s~\[xray_install_directory\]~$xray_install_directory~g" /lib/systemd/system/xray.service
 		systemctl daemon-reload
